@@ -29,6 +29,7 @@
         <module>user</module>
         <module>msg</module>
         <module>gateway</module>
+        <module>register</module>
     </modules>
 
     <dependencyManagement>
