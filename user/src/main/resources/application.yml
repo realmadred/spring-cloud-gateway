@@ -7,10 +7,10 @@ spring:
 
   datasource:
     name: test
-    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/test?useUnicode=true&characterEncoding=UTF8
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/test?serverTimezone=Shanghai&useUnicode=true&characterEncoding=utf8&useSSL=false
     username: ${MYSQL_USERNAME:root}
     password: ${MYSQL_PASSWORD:feng}
-    driver-class-name: com.mysql.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       maximum-pool-size: 64
   redis:
@@ -18,7 +18,10 @@ spring:
     port: 6379
     lettuce:
       pool:
-        max-wait: 5s
+        max-active: 200 #连接池最大连接数（使用负值表示没有限制）
+        max-idle: 20 # 连接池中的最大空闲连接
+        min-idle: 5 #连接池中的最小空闲连接
+        max-wait: 1000 # 连接池最大阻塞等待时间（使用负值表示没有限制）
 
   data:
     elasticsearch:
@@ -26,3 +29,11 @@ spring:
       cluster-nodes: 47.107.47.66:9300
       repositories:
         enabled: true
+eureka:
+  instance:
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 15
+  client:
+    enabled: true
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/

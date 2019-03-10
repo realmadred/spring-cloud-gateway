@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>register</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0-SNAPSHOT</version>
     <name>register</name>
     <description>register-center</description>
 

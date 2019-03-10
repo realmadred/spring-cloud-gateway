@@ -1,5 +1,6 @@
 package com.feng.user.service.impl;
 
+import com.feng.common.entity.PageParam;
 import com.feng.user.dao.UserRepository;
 import com.feng.user.entity.User;
 import com.feng.user.service.UserService;
@@ -25,8 +26,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Long count() {
+        return userRepository.count();
+    }
+
+    @Override
     public void delete(User article) {
         userRepository.delete(article);
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        userRepository.deleteById(id);
     }
 
     @Override
@@ -39,10 +50,10 @@ public class UserServiceImpl implements UserService {
         return userRepository.findAll();
     }
 
-
     @Override
-    public Page<User> findByUsername(String username, PageRequest pageRequest) {
-        return userRepository.findByUsername(username, pageRequest);
+    public Page<User> findByUsername(String username, PageParam pageParam) {
+        return userRepository.findByUsername(username, PageRequest.of(pageParam.getPage(),
+                pageParam.getSize()));
     }
 
     @Override
