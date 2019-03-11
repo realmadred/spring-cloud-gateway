@@ -4,3 +4,52 @@ server:
 spring:
   application:
     name: gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: user
+          uri: lb://user
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 1  #每秒流量
+                redis-rate-limiter.burstCapacity: 2  #突发流量
+                key-resolver: "#{@userKeyResolver}"  #限流的key
+            - name: Hystrix
+              args:
+                name: fallbackcmd
+                fallbackUri: forward:/fail
+          predicates:
+            - Path=/user/**
+        - id: requestratelimiter_route
+          uri: http://127.0.0.1:8081
+          filters:
+            - StripPrefix=1
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 2
+                redis-rate-limiter.burstCapacity: 4
+                key-resolver: "#{@userKeyResolver}"
+          predicates:
+            - Path=/baidu/**
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    lettuce:
+      pool:
+        max-active: 200 #连接池最大连接数（使用负值表示没有限制）
+        max-idle: 20 # 连接池中的最大空闲连接
+        min-idle: 5 #连接池中的最小空闲连接
+        max-wait: 1000 # 连接池最大阻塞等待时间（使用负值表示没有限制）
+
+logging:
+  level:
+    org.springframework.cloud.gateway: TRACE
+    org.springframework.http.server.reactive: DEBUG
+    org.springframework.web.reactive: DEBUG
+    reactor.ipc.netty: DEBUG
+    reactor.netty: DEBUG
