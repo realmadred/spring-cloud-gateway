@@ -3,7 +3,6 @@ package com.feng.user.service;
 import com.feng.common.entity.PageParam;
 import com.feng.user.entity.User;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 
