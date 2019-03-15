@@ -8,12 +8,13 @@ spring:
     gateway:
       discovery:
         locator:
-          enabled: true
-          lower-case-service-id: true
+          enabled: true #启用服务发现 可以实用服务名称自动路由到指导的服务 并自动去掉服务名
+          lower-case-service-id: true #使用小写
       routes:
-        - id: user
+        - id: userApi
           uri: lb://user
           filters:
+            - StripPrefix=1 #自己配置的需要过滤前缀
             - name: RequestRateLimiter
               args:
                 redis-rate-limiter.replenishRate: 1  #每秒流量
@@ -24,18 +25,9 @@ spring:
                 name: fallbackcmd
                 fallbackUri: forward:/fail
           predicates:
-            - Path=/user/**
-        - id: requestratelimiter_route
-          uri: http://127.0.0.1:8081
-          filters:
-            - StripPrefix=1
-            - name: RequestRateLimiter
-              args:
-                redis-rate-limiter.replenishRate: 2
-                redis-rate-limiter.burstCapacity: 4
-                key-resolver: "#{@userKeyResolver}"
-          predicates:
-            - Path=/baidu/**
+            - Path=/userApi/**
+
+
   redis:
     host: 127.0.0.1
     port: 6379
