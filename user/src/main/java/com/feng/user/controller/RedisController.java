@@ -3,6 +3,7 @@ package com.feng.user.controller;
 import com.feng.user.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
+import org.springframework.data.redis.core.ReactiveValueOperations;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -39,10 +40,29 @@ public class RedisController {
      * @return str
      */
     @PostMapping("/add")
-    public Mono<Boolean> add(@RequestBody User user) {
-        return redisTemplate.opsForValue().set(user.getId(), user);
+    public Mono<User> add(@RequestBody User user) {
+        final ReactiveValueOperations valueOperations = redisTemplate.opsForValue();
+        return valueOperations.getAndSet("user:"+user.getId(), user);
     }
 
+    /**
+     * 添加数据
+     * @author liufeng
+     * @date 2019年3月15日
+     * @return str
+     */
+    @PostMapping("/addUser")
+    public Mono<User> addUser(@RequestBody User user) {
+        final ReactiveValueOperations valueOperations = redisTemplate.opsForValue();
+        return valueOperations.getAndSet(user.getId(), user);
+    }
+
+    @GetMapping(value = "/user/{id}")
+    public Mono<User> findCityById(@PathVariable("id") Long id) {
+        String key = "user:" + id;
+        ReactiveValueOperations<String, User> operations = redisTemplate.opsForValue();
+        return operations.get(key);
+    }
 
     /**
      * 多个操作
@@ -50,12 +70,9 @@ public class RedisController {
      */
     @PostMapping("/putAll")
     public Flux putAll() {
-        Mono a = redisTemplate.opsForValue().set("a","aaa");
-        Mono b = redisTemplate.opsForValue().set("b","bbb");
-        Mono c = redisTemplate.opsForValue().set("c","ccc");
-        a.subscribe(System.out::println);//这里需要消费才行。否则无法真正操作。
-        b.subscribe(System.out::println);
-        c.subscribe(System.out::println);
+        Mono a = redisTemplate.opsForValue().set("a","aaa1");
+        Mono b = redisTemplate.opsForValue().set("b","bbb1");
+        Mono c = redisTemplate.opsForValue().set("c","ccc1");
         return Flux.just(a, c);
     }
 
